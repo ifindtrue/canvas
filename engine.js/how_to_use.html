@@ -1,0 +1,241 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>engine.js 사용 설명서</title>
+		<meta charset="utf8">
+
+		<!--제출 라이브러리-->
+		<script src="./js/cvss.js"></script>
+		<script src="./js/engine.js"></script>
+
+		<!--stylesheet-->
+		<link href="./css/stylesheet.css" rel="stylesheet">
+
+		<!--리소스-->
+		<link href="./resource/css/bootstrap.min.css" rel="stylesheet">
+		<script src="./resource/js/jquery-3.1.0.min.js"></script>
+	</head>
+	<body>
+		<section class="container">
+			<h2>engine.js <small><b>HTML5 CANVAS 물리(엔진) 라이브러리</b></small></h2>
+			<hr/>
+			<article class="about">
+				<h3 style="margin-top:0">engine.js이란</h3>
+				engine.js는 HTML5 CANVAS를 기반으로한 물리 엔진입니다.<br/>
+				혹시 파일에 같이 첨부한 cvss라는 폴더를 보셨습니까?<br/> 
+				cvss는 HTML5 CANVAS의 단순한 그리기 기능 뿐만아니라, 여러 스타일속성, 이벤트, 함수 등을 통해 더 손쉽게 HTML5 CANVAS를 관리할 수 있겠금 하는 라이브러리입니다.<br/>
+				그런 <b class="text-primary">cvss를 이용하여 물리속성을 추가한 라이브러리</b>가 engine.js입니다. <small>(네이밍이 새폴더 급)</small><br/>
+				<b style="font-size:1.2em;">engine.js는 cvss와 함께 이용되어, 웹안에서 보다 편리하게 게임을 제작할 수 있다는데 의미가있습니다.</b><br/>
+			</article>
+			<h3>구조도 [대략]</h3>
+			<img src="./img/diagram.png">
+			<h3>엔진객체 정의</h3>
+<pre style="background:#fff;color:#000">[캔버스 객체]<span style="color:#ff5600">=</span><span style="color:#ff5600">new</span> Canvas(<span style="color:#00a33f">"#canvas_id"</span>);
+[엔진 객체]<span style="color:#ff5600">=</span><span style="color:#ff5600">new</span> Engine([캔버스객체],<span class="text-primary"><u><b>[엔진정보]</b></u></span>);
+</pre>		
+			<article>
+				engine.js를 이용하려면 엔진객체를 설정해주어야합니다.<br/>
+				엔진객체를 설정하기전에 <b>당연히 어느 캔버스에 엔진을 적용할지 설정</b>을해주어야 하겠죠.<br/>
+				engine.js는 cvss를 출력기반으로 하는 물리엔진이기 때문에 캔버스를 설정할 때에는 cvss를 사용할 때 설정한 [캔버스객체]를 엔진에 설정해 주어야합니다.<br/>
+				<label class="text-primary">[엔진정보]</label>
+				<ul>
+					<li>
+						<b class="text-primary">fps : [number]</b>
+						<p>
+							fps, Frame Per Second 의 축약어로, 1초동안 얼마나 화면이 갱신될 것인지 설정하실 수 있습니다.
+						</p>
+					</li>
+					<li>
+						<b class="text-primary">gravity : [number]</b>
+						<p>
+							<b>엔진 내에서의 중력을 설정할 수 있습니다.</b>
+						</p>
+					</li>
+				</ul>
+			</article>
+			<hr/>
+			<h3>물리 속성</h3>
+			engine.js에서는 입자의 물리적인 성질을 설정할 수 있습니다.<br/>
+			질량이나 속도,힘,가속도 이런거 말이죠.<br/>
+			처음 <a href="#">.particle()</a>을 이용해 객체를 만들 때, 혹은 <a href="#property">.property()</a>를 통해 입자에 물리속성을 적용 할 수 있습니다.<br/>
+			<small>(물론 입력하지않으면 기본 값을 적용합니다.)</small><br/>
+			여기서는 물리속성의 종류만을 간단하게 확인한 후, 이를 적용하는 방법은 함수설명 부분에서 확인해주세요.<br/><br/>
+			<ul>
+				<li>
+					<b class="text-danger">m : number<small> [질량,mass]</small></b>
+					<p>
+						질량은 그냥 질량입니다.<br/>
+						입자의 질량은 충돌후 분리속도나 가해진힘에 대하여 얼마나 가속도가 붙는지에 대한 척도가 될 수 있습니다.<br/>
+						또한, <b>배경입자는 질량이 <span class="text-danger">Infinity</span>입니다.</b><br/><br/>
+
+						더 설명하자면, 질량은 엔진내에서 역질량으로 변환되어 집니다.<br/>
+						이유는 가속도나 충격량 공식에서 질량을 나누는 경우가 자주있는데, 연산의 경우 곱하기가 나누기보다 수십배는 연산속도가 빠르기 때문에, 역질량을 미리 보관하여 연산에 사용하면 엔진의 연산속도를 증가되기 따문입니다.
+					</p>
+				</li>
+				<li>
+					<b class="text-danger">f : [vector] <small>[힘]</small></b>
+					<p>
+						힘 2차원 벡터로 이루어져 있습니다.<br/>
+						f=ma라는 공식에 따라, 입자에 힘을 가하면 가속도 값에 영향을 미칩니다.</br/>
+						<b class="text-primary">이 속성이외에도, 가속도,속도,우치 전부 이차원 벡터입니다. x축과 y축에 대하여 모두 값을 갖기때문이죠.</b><br/>
+						벡터는 배열의형태로 입력해주세요.
+					</p>
+				</li>
+				<li>
+					<b class="text-danger">a : [vector] <small>[가속도]</small></b>
+					<p>
+						입자를 가속시킵니다.<br/>
+						가속도는 속도를 변화 시키는 값입니다.
+					</p>
+				</li>
+				<li>
+					<b class="text-danger">v : [vector] <small>[속도,velocity]</small></b>
+					<p>
+						입자에 속도를 가합니다.<br/>
+						속도는 위치를 변화 시키는 값입니다.
+					</p>
+				</li>
+				<li>
+					<b class="text-danger">s : [vector] <small>[위치]</small></b>
+					<p>
+						입자에 위치를 변경합니다. <small>(라지만 사실 물리엔진에서는 속도나 위치를 사용자가 직접 변경시키면 안됩니다.)</small><br/>
+						참고로 말하자면, 적분기에서 위치는 가속도에대한 계산을 하고 있지않습니다.
+					</p>
+				</li>								
+			</ul>
+			<hr/>
+			<h3>일반 속성</h3>
+				<b class="text-primary">style : [cvss element name]</b>
+				<article>
+					입자의 스타일을 정의하기위해서는 style속성을 통해, cvss 객체의 이름을 지정해주어야합니다.<br/>
+					이 속성을 입력하지않을경우에는 그냥 입자의 이름을 적용해버립니다.
+				</article>
+				<b class="text-primary">applyGravity : [true or false]</b>
+				<article>
+					입자가 중력의 영향을 받는지 지정하는 속성입니다. (true or false)
+				</article>	
+				<b class="text-primary">contactHandling : [true or false]</b>
+				<article>
+					입자가 다른물체와 충돌 했을경우, 충돌반응이 일어나는지에 대한, 속성입니다.<br/>
+					즉, 보통 두 입자가 부딪치면, 일어나는 반응이 일어나는지 않일어나는지에대한 속성이죠.	
+				</article>								
+			<hr/>
+			<h3>함수 <small>engine.js에서 사용되는 함수들을 소개합니다.</small></h3>
+			<b class="text-primary">.particle()</b>
+			<article class="about">
+				.partcile()에 넘기는 매개변수는 cvss의 객체를 넘깁니다. 이는 입자의 스타일을 정의하기 위함입니다.<br/>
+				즉 cvss 객체를 그리기만하면, 의미가없고 .particle() 을 통해 엔진에 입자를 추가해주어야 물리적 특성을 띌 수 있다는 것입니다.<br/>
+				이 함수의 의미는 두가지 경우로 나뉩니다.<br/>
+				매개입자로 넘긴 값에 따라서말이죠. <b>.particle([name])</b>에서
+				<ul>
+					<li>
+						[name] 이 엔진에 등록되지 않은 입자라면,
+						<p>
+							이경우라면 .particle 함수에 추가하여 매개변수를 넘겨주는 걸 권장합니다.<br/>
+							<b>.particle([name],[물리속성])</b> 이런식으로 말이죠.
+						</p>
+					</li>
+					<li>
+						[name] 이 엔진에 등록 된 입자라면,
+						<p>
+							cvss의 .element() 처럼, 입자를 지정하는 역할을 합니다.
+						</p>
+					</li>
+				</ul>
+				<hr/>
+				<section class="example">
+					<canvas id="sample1" width=500 height=300></canvas>
+					<div class="btn btn-block btn-default sample-btn" data-type="sample1">실행</div>		
+				</section>
+<pre style="width:500px; margin:0 auto; background:#fff;color:#000"><span style="color:#ff5600">var</span> sample1_canvas<span style="color:#ff5600">=</span><span style="color:#ff5600">new</span> <span style="color:#21439c">Canvas</span>(<span style="color:#00a33f">"#sample1"</span>);
+    sample1_canvas.drawElement({
+        E:{
+            x:100,
+            y:0,
+            background:<span style="color:#00a33f">"orange"</span>
+        },
+        E2:{
+            x:0,
+            y:<span style="color:#00a33f">"100%"</span>,
+            width:<span style="color:#00a33f">"100%"</span>,
+            origin:<span style="color:#00a33f">"0 100%"</span>,
+            background:<span style="color:#00a33f">"#aaa"</span>
+        }
+    });
+<span style="color:#ff5600">var</span> sample1<span style="color:#ff5600">=</span><span style="color:#ff5600">new</span> <span style="color:#21439c">Engine</span>(sample1_canvas,{
+    fps:64,
+    gravity:10
+});
+sample1.particle(<span style="color:#00a33f">"E"</span>);
+sample1.particle(<span style="color:#00a33f">"E2"</span>,{
+    m:<span style="color:#a535ae">Infinity</span>
+});
+</pre>				
+			</article>
+			<a href="#property" name="property">.property()</a>
+			<article class="about">
+				.property()는 두가지의 경우로 나뉩니다.
+				<ul>
+					<li>
+						<b class="text-primary">.property([property])</b>
+						<p>
+							.particle()로 지정된 입자의 속성[property]값을 불러옵니다.
+						</p>
+					</li>
+					<li>
+						<b class="text-primary">.property([property],[value])</b>
+						<p>
+							.particle()로 지정된 입자의 속성[property]값에 [value]를 적용합니다.
+						</p>
+					</li>
+				</ul>
+			</article>
+			<a href="#stop" name="stop">.stop()</a>
+			<article class="about">
+				엔진을 멈춥니다.
+			</article>
+			<hr/>
+			<h3>태그함수</h3>
+			<a href="#addTag" class="text-danger" name="addTag">.addTag([tag name])</a>
+			<article class="about">
+				.particle()로 지정된 입자에 태그[tag name]를 추가합니다.
+			</article>
+			<a href="#removeTag" class="text-danger" name="removeTag">.removeTag()</a>
+			<article class="about">
+				.particle()로 지정된 입자에 등록된 태그를 삭제합니다.
+			</article>	
+			<a href="#tagList" class="text-danger" name="tagList">.tagList([tag name])</a>
+			<article class="about">
+				태그[tag name]를 가지고 있는 입자들을 array형태로 return 합니다.
+			</article>
+
+			<h3>이벤트</h3>
+			<a href="#collision" name="collision">.collision([function])</a>
+			<article class="about">
+				.particle()로 지정한 입자가 다른입자와 충돌할경우 함수가 실행됩니다.<br/>
+				매개변수로 전달되는 값은 충돌한 다른입자의 이름입니다.
+			</article>	
+			<hr/>
+			<h3>onParticle 알고리즘<small> : 출품작인 만큼 새롭게 제작한 알고리즘을 소개해드리고 싶습니다.</small></h3>	
+			<article class="about">
+				engine.js 를 제작하면서 충돌부분이 제일 어려웠습니다.<br/>
+				충돌감지를 할 때 너무많은 자원이 소비되기 때문인데요, 특히나 engine.js는 웹에서 실행되기 때문에 웹환경에 무리가가지않도록 하기위해서는 새로운 알고리즘을 개발할 수밖에 없었습니다.<br/>
+				<b>rest상태와 collision상태를 구분</b>하는것을 중점으로 했습니다.<br/>
+				그리고 이상태를 구분짓기위해 <b class="text-primary">한 입자가 다른입자위에 올려져 있다.</b> 라는 개념을 위주로 알고리즘을 제작했습니다.<br/>
+				그럼 상황을 가정해서, A와 B라는 객체가있다고 합시다. 그리고 이 두물체중 하나가 다른객체위에 올려져있다고 할때,<br/>
+				<ol>
+					<li>만약, 둘 다 속도를 가지지않는다면 감지를 종료합니다.</li>
+					<li>만약, 한 쪽만이 속도를 가지고, 이물체 밑에있는 입자(지표면)와 수직으로 이동할 경우, 감지를 종료합니다.<small>(지표면과 속도와의 내적이 0이라는 뜻으로 해석하셔도 됩니다.)</small></li>
+				</ol><br/>
+				참고로, on상태를 감지하는 방법은, 두 입자가 충돌했을 때 충돌처리 과정에서 충돌법선의 값과 속도를 통해 파악을 합니다.
+			</article>		
+			<h3>기타 편법</h3>
+			<article class="about">
+				이번에 소개할 것은 알고리즘 까지 말할건 아니지만, 제가 발견한 편법(?)입니다.<br/>
+				한물체가 다른물체위를 누를때, 연쇄적인 충돌에대해 대비하는 방법인데요.<br/>
+				입자가 충돌하여 충돌처리의 순간 밑에있는 물체를 관통처리 전 질량을 Infinity(정확히는 역질량을 0)으로 하여 계산하면, 왠만한 버그가 해결됩니다.
+			</article>
+		</section>
+		<script src="./js/main.js"></script>
+	</body>
+</html>

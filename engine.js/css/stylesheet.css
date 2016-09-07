@@ -1,0 +1,25 @@
+.about{
+	width:100%;
+	padding:10px;
+	background: #eee;
+	line-height: 200%;
+}
+article{
+	line-height: 200%;
+}
+.container a{
+	font-weight: bold;
+}
+canvas{margin:0!important; background:#fff; outline:1px solid #ddd;}
+.example{
+	width:500px;
+	margin:0 auto 10px auto;
+}
+.example:after{
+	content:""; display: block; clear: both;
+}
+	.example *{
+		display: block;
+		float: left;
+		border-radius: 0!important;
+	}
